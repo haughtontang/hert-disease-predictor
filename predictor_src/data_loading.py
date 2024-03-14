@@ -10,12 +10,13 @@ import pandas as pd
 # The place I got the data from says that a random forrest classification/classic logistic regression is the most accurate model to use
 
 
-def load_raw_data():
+def load_raw_data() -> pd.DataFrame:
     # fetch dataset
     heart_disease = fetch_ucirepo(id=45)
     all_data_df = heart_disease.data.features
     targets_df = heart_disease.data.targets
     all_data_df["y"] = targets_df["num"]
+    return all_data_df
 
 
 def scale_data(data_df: pd.DataFrame, features_to_scale: list) -> pd.DataFrame:
