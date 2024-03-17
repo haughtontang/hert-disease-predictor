@@ -1,4 +1,3 @@
-import numpy as np
 from predictor_src.data_loading import load_raw_data, scale_data, return_train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -6,16 +5,15 @@ from sklearn.metrics import accuracy_score
 
 def main():
     # Load and transform the data
-    raw_df = load_raw_data()
+    raw_df, labels_df = load_raw_data()
+    # I tried to replace nan values with the median and it made the performance worse overall
+    # TODO - make another model that predicts ca and thal based on the other features as a method to replace them
     # Remove rows where there are any nan values - I may want to do this more inteligently but I will remove it for now just to get it done
-    raw_df = raw_df.dropna(how="any")
+    raw_df_no_nan = raw_df.dropna(how="any")
+    labels_df.drop(raw_df.index.difference(raw_df_no_nan.index), inplace=True)
     features_to_scale = ["age", "trestbps", "chol", "thalach"]
-    scaled_df = scale_data(data_df=raw_df, features_to_scale=features_to_scale)
-    x_train, x_test = return_train_test_split(data_df=scaled_df)
-    y_train, y_test = np.array(x_train["y"]), np.array(x_test["y"])
-    # remove labels from training data
-    del x_train["y"]
-    del x_test["y"]
+    scaled_df = scale_data(data_df=raw_df_no_nan, features_to_scale=features_to_scale)
+    x_train, x_test, y_train, y_test = return_train_test_split(data_df=scaled_df, label_data_df=labels_df)
 
     # Create the model
     model = LogisticRegression()
